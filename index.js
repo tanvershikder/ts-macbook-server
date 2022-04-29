@@ -39,9 +39,11 @@ async function run(){
         })
 
         //get my item
-        app.get('/products', async(req,res)=>{
+        app.get('/product', async(req,res)=>{
             const query = req.query;
-            const result = await mackbookCollection.find(query)
+            console.log(query);
+            const cursor = mackbookCollection.find(query)
+            const result = await cursor.toArray()
             res.send(result)
         })
 
@@ -52,16 +54,18 @@ async function run(){
             res.send(result)
         })
 
-        // post quantity
+        // Update quantity
         app.put('/products/:id',async(req,res)=>{
             const id = req.params.id;
-            const quantity = req.body;
+            console.log(id);
+            const quantity = req.body.updatequantity;
+            console.log(quantity);
             console.log(quantity);
             const filter = {_id: ObjectId(id)}
             const option = {upsert: true };
             const updatePro = {
                 $set: {
-                    quantity : quantity,
+                    quantity
                 }
             }
             const result = await mackbookCollection.updateOne(filter,updatePro,option);
