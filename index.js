@@ -67,7 +67,6 @@ async function run() {
 
             else {
                 const result = await mackbookCollection.insertOne(newProduct)
-                res.send(result)
                 res.send({success:"service add successfully"})
 
             }
