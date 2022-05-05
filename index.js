@@ -52,13 +52,13 @@ async function run() {
         //post products
         app.post('/products', async (req, res) => {
             const newProduct = req.body;
-            const tokenInfo = req.header.authorization
+            const tokenInfo = req.headers.authorization;
 
             const [email, accesstoken] = tokenInfo.split(" ")
-            console.log(accesstoken);
+            // console.log(accesstoken);
 
             const decoded = verfyToken(accesstoken)
-            console.log(decoded.email);
+            // console.log(decoded.email);
 
             if (email !== decoded.email) {
                 res.send({ success: "unAuthorized user" })
@@ -104,7 +104,7 @@ async function run() {
             // console.log(email);
 
             const token = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
-            console.log("token ", token);
+            // console.log("token ", token);
             res.send({ token: token })
 
         })
@@ -127,3 +127,18 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`port is running on`, port)
 })
+
+
+const verfyToken = (token) => {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+        if (err) {
+            email = 'invalid email'
+        }
+        if (decoded) {
+
+            console.log(decoded);
+            email = decoded;
+        }
+    });
+    return email;
+}
