@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 4000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -79,6 +80,18 @@ async function run(){
             const result = await mackbookCollection.deleteOne(query);
             res.send(result)
         })
+
+        //jwt ganarate 
+        app.post('/login', async (req, res) => {
+            const email = req.body;
+            // console.log(email);
+
+            const token = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+            console.log("token ",token);
+            res.send({ token: token })
+            
+        })
+
     }
     finally{
 
