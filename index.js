@@ -41,12 +41,25 @@ async function run() {
         })
 
         //get my item
-        app.get('/product', async (req, res) => {
-            const query = req.query;
-            console.log(query);
-            const cursor = mackbookCollection.find(query)
-            const result = await cursor.toArray()
-            res.send(result)
+        // app.get('/product', async (req, res) => {
+        //     const query = req.query;
+        //     console.log(query);
+        //     const cursor = mackbookCollection.find(query)
+        //     const result = await cursor.toArray()
+        //     res.send(result)
+        // })
+        app.get('/order', verifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email
+            const email = req.query.email;
+            if (email === decodedEmail) {
+                const query = { email: email }
+                const cursor = mackbookCollection.find(query);
+                const order = await cursor.toArray();
+                res.send(order)
+            }
+            else{
+                res.status(403).send({message: "forbiden access"})
+            }
         })
 
         //post products
@@ -55,16 +68,11 @@ async function run() {
             const tokenInfo = req.headers.authorization;
 
             const [email, accesstoken] = tokenInfo.split(" ")
-            // console.log(accesstoken);
-
             const decoded = verfyToken(accesstoken)
-            // console.log(decoded.email);
-
             if (email !== decoded.email) {
                 res.send({ success: "unAuthorized user" })
 
             }
-
             else {
                 const result = await mackbookCollection.insertOne(newProduct)
                 res.send({success:"product add successfully"})
@@ -141,4 +149,21 @@ const verfyToken = (token) => {
         }
     });
     return email;
+}
+
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: "unothorized user" })
+    }
+    const token = authHeader.split(" ")[1]
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+        if (error) {
+            return res.status(403).send({ message: "forbiden Access" })
+        }
+        console.log("decoded ", decoded);
+        req.decoded = decoded;
+        next()
+    })
+    
 }
