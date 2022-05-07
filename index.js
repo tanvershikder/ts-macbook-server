@@ -48,7 +48,7 @@ async function run() {
         //     const result = await cursor.toArray()
         //     res.send(result)
         // })
-        app.get('/order', verifyJWT, async (req, res) => {
+        app.get('/product', verifyJWT, async (req, res) => {
             const decodedEmail = req.decoded.email
             const email = req.query.email;
             if (email === decodedEmail) {
